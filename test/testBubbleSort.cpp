@@ -18,11 +18,11 @@ struct Grid
 		return *(value + row * ColumCount + col);
 	}
 
-	int ProductOfRow(int colStartIndex)
+	int ProductOfRow(int rowStart, int colStartIndex)
 	{
 		int product = 1;
 		for (int colIndex = colStartIndex; colIndex < colStartIndex + 4; colIndex++) {
-			product *= getNum(0, colIndex);
+			product *= getNum(rowStart, colIndex);
 		}
 		return product;
 	}
@@ -30,9 +30,10 @@ struct Grid
 	int maxProductsWithNeighbors()
 	{
 		int maxProduct = 0;
+
 		for(int colIndex = 0; colIndex < ColumCount - 3; colIndex++)
 		{
-			int tempMaxProduct = ProductOfRow(colIndex);
+			int tempMaxProduct = ProductOfRow(0, colIndex);
 			maxProduct = max(maxProduct, tempMaxProduct);
 		}
 		return maxProduct;
@@ -64,6 +65,13 @@ TEST(TestDojo, testOnly6NumbersInARow) {
 	Grid grid(6, 1, (int *)num);
 	int result = grid.maxProductsWithNeighbors();
 	CHECK_EQUAL(900, result);
+}
+
+TEST(TestDojo, test2X4) {
+	int num[2][4] = { { 1, 2, 3, 5 } ,{2,4,6,8}};
+	Grid grid(4, 2, (int *)num);
+	int result = grid.maxProductsWithNeighbors();
+	CHECK_EQUAL(384, result);
 }
 
 
