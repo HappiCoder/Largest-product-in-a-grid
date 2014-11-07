@@ -6,33 +6,65 @@ using namespace std;
 
 TEST_GROUP(TestDojo) {
 };
-
-int getNum(int *nums, int col, int i, int j) {
-	return *(nums + i * col + j);
-}
-
-int maxProductsWithNeighbors(int * nums, int nrOfRows, int nrOfColumn) {
-	if (nrOfColumn == 4) {
-		return getNum(nums, 4, 0, 0) * getNum(nums, 4, 0, 1)
-				* getNum(nums, 4, 0, 2) * getNum(nums, 4, 0, 3);
+struct Grid
+{
+	Grid(int ColumCount, int RowCount, const int *buf)
+		: ColumCount(ColumCount)
+		, RowCount(RowCount)
+		, value(buf)
+	{}
+	int getNum(int row, int col)
+	{
+		return *(value + row * ColumCount + col);
 	}
 
-	int maxProduct = 0;
-	int product1 = getNum(nums, 5, 0, 0) * getNum(nums, 5, 0, 1)
-			* getNum(nums, 5, 0, 2) * getNum(nums, 5, 0, 3);
-	int product2 = getNum(nums, 5, 0, 1) * getNum(nums, 5, 0, 2)
-			* getNum(nums, 5, 0, 3) * getNum(nums, 5, 0, 4);
-	return max(product1, product2);
-}
+	int ProductOfRow(int colStartIndex)
+	{
+		int product = 1;
+		for (int colIndex = colStartIndex; colIndex < colStartIndex + 4; colIndex++) {
+			product *= getNum(0, colIndex);
+		}
+		return product;
+	}
+
+	int maxProductsWithNeighbors()
+	{
+		int maxProduct = 0;
+		for(int colIndex = 0; colIndex < ColumCount - 3; colIndex++)
+		{
+			int tempMaxProduct = ProductOfRow(colIndex);
+			maxProduct = max(maxProduct, tempMaxProduct);
+		}
+		return maxProduct;
+
+	}
+private:
+	int ColumCount;
+	int RowCount;
+	const int *value;
+};
+
 
 TEST(TestDojo, testOnly4NumbersInARow1) {
-int num[1][4] = { { 1, 2, 3, 4 } };
-int result = maxProductsWithNeighbors((int*) num, 1, 4);
-CHECK_EQUAL(24, result);
+	int num[1][4] = { { 1, 2, 3, 4 } };
+	Grid grid(4, 1, (int *)num);
+	int result = grid.maxProductsWithNeighbors();
+	CHECK_EQUAL(24, result);
 }
 
 TEST(TestDojo, testOnly5NumbersInARow) {
-int num[1][5] = { { 1, 2, 3, 5, 6 } };
-int result = maxProductsWithNeighbors((int*) num, 1, 5);
-CHECK_EQUAL(180, result);
+	int num[1][5] = { { 1, 2, 3, 5, 6 } };
+	Grid grid(5, 1, (int *)num);
+	int result = grid.maxProductsWithNeighbors();
+	CHECK_EQUAL(180, result);
 }
+
+TEST(TestDojo, testOnly6NumbersInARow) {
+	int num[1][6] = { { 1, 2, 3, 5, 6, 10 } };
+	Grid grid(6, 1, (int *)num);
+	int result = grid.maxProductsWithNeighbors();
+	CHECK_EQUAL(900, result);
+}
+
+
+
